@@ -1,0 +1,1 @@
+DROP FUNCTION generate_member_code;
