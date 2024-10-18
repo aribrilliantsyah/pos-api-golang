@@ -94,9 +94,12 @@ definitions:
     type: object
   schemas.CreateRefund:
     properties:
+      reason:
+        type: string
       trx_number:
         type: string
     required:
+    - reason
     - trx_number
     type: object
   schemas.CreateUser:
@@ -931,6 +934,217 @@ paths:
       summary: Get all deleted products
       tags:
       - products
+  /api/v1/reports/fast-moving:
+    get:
+      description: Get list of fast moving products for specific month and year
+      parameters:
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get fast moving products
+      tags:
+      - reports
+  /api/v1/reports/orders:
+    get:
+      description: Get orders list with pagination and filters
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: limit
+        type: integer
+      - description: Customer ID filter
+        in: query
+        name: customer_id
+        type: integer
+      - description: Cashier ID filter
+        in: query
+        name: cashier_id
+        type: integer
+      - description: Order status filter
+        in: query
+        name: status
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get all orders with optional filters
+      tags:
+      - reports
+  /api/v1/reports/orders/{id}:
+    get:
+      description: Get order details including customer and items
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get detailed order information by ID
+      tags:
+      - reports
+  /api/v1/reports/slow-moving:
+    get:
+      description: Get list of slow moving products for specific month and year
+      parameters:
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get slow moving products
+      tags:
+      - reports
+  /api/v1/reports/top-cashiers:
+    get:
+      description: Get list of top performing cashiers for specific month and year
+      parameters:
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get top performing cashiers
+      tags:
+      - reports
+  /api/v1/reports/top-customers:
+    get:
+      description: Get list of top customers for specific month and year
+      parameters:
+      - description: Month (1-12)
+        in: query
+        name: month
+        required: true
+        type: integer
+      - description: Year
+        in: query
+        name: year
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get top customers
+      tags:
+      - reports
   /api/v1/transaction/order:
     post:
       consumes:

@@ -52,11 +52,36 @@ func NewServer(config config.Config) *Server {
 
 func (s *Server) setupRoutes() {
 	prefix := "/api/v1/"
+
+	s.engine.Static("/assets", "./docs")
 	s.engine.GET("/", func(ctx *gin.Context) {
 		ctx.JSON(http.StatusOK, gin.H{
 			"status":  "success",
 			"message": "welcome to api, docs: /docs/index.html",
 		})
+	})
+
+	s.engine.GET("/scalar/docs/*any", func(ctx *gin.Context) {
+		ctx.Data(http.StatusOK, "text/html; charset=utf-8", []byte(`
+			<!doctype html>
+			<html>
+			<head>
+				<title>Scalar API Reference</title>
+				<meta charset="utf-8" />
+				<meta
+				name="viewport"
+				content="width=device-width, initial-scale=1" />
+			</head>
+			<body>
+				<!-- Need a Custom Header? Check out this example https://codepen.io/scalarorg/pen/VwOXqam -->
+				<script
+				id="api-reference"
+				data-url="/assets/scalar.json"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/scalar-api-reference/1.25.40/standalone.js"></script>
+			
+			</body>
+			</html>
+		`))
 	})
 
 	// Public routes
@@ -72,6 +97,7 @@ func (s *Server) setupRoutes() {
 	routes.SetupProductRoutes(s.db, s.ctx, protected)
 	routes.SetupProductHistoryRoutes(s.db, s.ctx, protected)
 	routes.SetupTransactionRoutes(s.db, s.ctx, s.sqlDB, protected)
+	routes.SetupReportRoutes(s.db, s.ctx, protected)
 
 	// Handle 404
 	s.engine.NoRoute(func(ctx *gin.Context) {

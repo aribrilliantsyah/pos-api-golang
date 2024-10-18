@@ -84,6 +84,9 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getAllDeletedUsersStmt, err = db.PrepareContext(ctx, getAllDeletedUsers); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllDeletedUsers: %w", err)
 	}
+	if q.getAllOrdersStmt, err = db.PrepareContext(ctx, getAllOrders); err != nil {
+		return nil, fmt.Errorf("error preparing query GetAllOrders: %w", err)
+	}
 	if q.getAllProductHistoryStmt, err = db.PrepareContext(ctx, getAllProductHistory); err != nil {
 		return nil, fmt.Errorf("error preparing query GetAllProductHistory: %w", err)
 	}
@@ -111,6 +114,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getCustomerByPhoneExceptIDStmt, err = db.PrepareContext(ctx, getCustomerByPhoneExceptID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomerByPhoneExceptID: %w", err)
 	}
+	if q.getFastMovingProductsStmt, err = db.PrepareContext(ctx, getFastMovingProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetFastMovingProducts: %w", err)
+	}
+	if q.getOrderByIDStmt, err = db.PrepareContext(ctx, getOrderByID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetOrderByID: %w", err)
+	}
 	if q.getOrderByTrxNumberStmt, err = db.PrepareContext(ctx, getOrderByTrxNumber); err != nil {
 		return nil, fmt.Errorf("error preparing query GetOrderByTrxNumber: %w", err)
 	}
@@ -119,6 +128,15 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	}
 	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
+	}
+	if q.getSlowMovingProductsStmt, err = db.PrepareContext(ctx, getSlowMovingProducts); err != nil {
+		return nil, fmt.Errorf("error preparing query GetSlowMovingProducts: %w", err)
+	}
+	if q.getTopCashiersStmt, err = db.PrepareContext(ctx, getTopCashiers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTopCashiers: %w", err)
+	}
+	if q.getTopCustomersStmt, err = db.PrepareContext(ctx, getTopCustomers); err != nil {
+		return nil, fmt.Errorf("error preparing query GetTopCustomers: %w", err)
 	}
 	if q.getUserByIDStmt, err = db.PrepareContext(ctx, getUserByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetUserByID: %w", err)
@@ -270,6 +288,11 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getAllDeletedUsersStmt: %w", cerr)
 		}
 	}
+	if q.getAllOrdersStmt != nil {
+		if cerr := q.getAllOrdersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getAllOrdersStmt: %w", cerr)
+		}
+	}
 	if q.getAllProductHistoryStmt != nil {
 		if cerr := q.getAllProductHistoryStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getAllProductHistoryStmt: %w", cerr)
@@ -315,6 +338,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getCustomerByPhoneExceptIDStmt: %w", cerr)
 		}
 	}
+	if q.getFastMovingProductsStmt != nil {
+		if cerr := q.getFastMovingProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getFastMovingProductsStmt: %w", cerr)
+		}
+	}
+	if q.getOrderByIDStmt != nil {
+		if cerr := q.getOrderByIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getOrderByIDStmt: %w", cerr)
+		}
+	}
 	if q.getOrderByTrxNumberStmt != nil {
 		if cerr := q.getOrderByTrxNumberStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getOrderByTrxNumberStmt: %w", cerr)
@@ -328,6 +361,21 @@ func (q *Queries) Close() error {
 	if q.getProductByIDStmt != nil {
 		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
+		}
+	}
+	if q.getSlowMovingProductsStmt != nil {
+		if cerr := q.getSlowMovingProductsStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getSlowMovingProductsStmt: %w", cerr)
+		}
+	}
+	if q.getTopCashiersStmt != nil {
+		if cerr := q.getTopCashiersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTopCashiersStmt: %w", cerr)
+		}
+	}
+	if q.getTopCustomersStmt != nil {
+		if cerr := q.getTopCustomersStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getTopCustomersStmt: %w", cerr)
 		}
 	}
 	if q.getUserByIDStmt != nil {
@@ -464,6 +512,7 @@ type Queries struct {
 	getAllDeletedCustomersStmt     *sql.Stmt
 	getAllDeletedProductsStmt      *sql.Stmt
 	getAllDeletedUsersStmt         *sql.Stmt
+	getAllOrdersStmt               *sql.Stmt
 	getAllProductHistoryStmt       *sql.Stmt
 	getAllProductsStmt             *sql.Stmt
 	getAllUsersStmt                *sql.Stmt
@@ -473,9 +522,14 @@ type Queries struct {
 	getCustomerByIDStmt            *sql.Stmt
 	getCustomerByPhoneStmt         *sql.Stmt
 	getCustomerByPhoneExceptIDStmt *sql.Stmt
+	getFastMovingProductsStmt      *sql.Stmt
+	getOrderByIDStmt               *sql.Stmt
 	getOrderByTrxNumberStmt        *sql.Stmt
 	getOrderItemsByOrderIDStmt     *sql.Stmt
 	getProductByIDStmt             *sql.Stmt
+	getSlowMovingProductsStmt      *sql.Stmt
+	getTopCashiersStmt             *sql.Stmt
+	getTopCustomersStmt            *sql.Stmt
 	getUserByIDStmt                *sql.Stmt
 	getUserByUsernameStmt          *sql.Stmt
 	getUserByUsernameExceptIDStmt  *sql.Stmt
@@ -517,6 +571,7 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getAllDeletedCustomersStmt:     q.getAllDeletedCustomersStmt,
 		getAllDeletedProductsStmt:      q.getAllDeletedProductsStmt,
 		getAllDeletedUsersStmt:         q.getAllDeletedUsersStmt,
+		getAllOrdersStmt:               q.getAllOrdersStmt,
 		getAllProductHistoryStmt:       q.getAllProductHistoryStmt,
 		getAllProductsStmt:             q.getAllProductsStmt,
 		getAllUsersStmt:                q.getAllUsersStmt,
@@ -526,9 +581,14 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getCustomerByIDStmt:            q.getCustomerByIDStmt,
 		getCustomerByPhoneStmt:         q.getCustomerByPhoneStmt,
 		getCustomerByPhoneExceptIDStmt: q.getCustomerByPhoneExceptIDStmt,
+		getFastMovingProductsStmt:      q.getFastMovingProductsStmt,
+		getOrderByIDStmt:               q.getOrderByIDStmt,
 		getOrderByTrxNumberStmt:        q.getOrderByTrxNumberStmt,
 		getOrderItemsByOrderIDStmt:     q.getOrderItemsByOrderIDStmt,
 		getProductByIDStmt:             q.getProductByIDStmt,
+		getSlowMovingProductsStmt:      q.getSlowMovingProductsStmt,
+		getTopCashiersStmt:             q.getTopCashiersStmt,
+		getTopCustomersStmt:            q.getTopCustomersStmt,
 		getUserByIDStmt:                q.getUserByIDStmt,
 		getUserByUsernameStmt:          q.getUserByUsernameStmt,
 		getUserByUsernameExceptIDStmt:  q.getUserByUsernameExceptIDStmt,
