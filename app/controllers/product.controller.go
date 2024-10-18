@@ -56,6 +56,29 @@ func (p *ProductController) CreateProduct(ctx *gin.Context) {
 	}
 	UserID := userInfo.UserID
 
+	if _, err := p.db.GetCategoryByID(ctx, payload.CategoryID); err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"status":  "failed",
+				"message": "category id not found",
+			})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if payload.Price < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": "invalid price (need positive number/decimal)",
+		})
+		return
+	}
+
 	args := &db.CreateProductParams{
 		Name:       payload.Name,
 		Price:      strconv.FormatFloat(payload.Price, 'f', 2, 64),
@@ -144,6 +167,21 @@ func (p *ProductController) UpdateProduct(ctx *gin.Context) {
 	}
 	UserID := userInfo.UserID
 
+	if _, err := p.db.GetCategoryByID(ctx, payload.CategoryID); err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{
+				"status":  "failed",
+				"message": "category id not found",
+			})
+			return
+		}
+		ctx.JSON(http.StatusBadGateway, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+
 	if _, err := p.db.GetProductByID(ctx, id); err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, gin.H{
@@ -155,6 +193,14 @@ func (p *ProductController) UpdateProduct(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadGateway, gin.H{
 			"status":  "failed",
 			"message": err.Error(),
+		})
+		return
+	}
+
+	if payload.Price < 0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"status":  "failed",
+			"message": "invalid price (need positive number/decimal)",
 		})
 		return
 	}

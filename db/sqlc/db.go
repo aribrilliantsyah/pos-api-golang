@@ -33,11 +33,20 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.createCustomerStmt, err = db.PrepareContext(ctx, createCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateCustomer: %w", err)
 	}
+	if q.createOrderStmt, err = db.PrepareContext(ctx, createOrder); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateOrder: %w", err)
+	}
+	if q.createOrderItemStmt, err = db.PrepareContext(ctx, createOrderItem); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateOrderItem: %w", err)
+	}
 	if q.createProductStmt, err = db.PrepareContext(ctx, createProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProduct: %w", err)
 	}
 	if q.createProductHistoryStmt, err = db.PrepareContext(ctx, createProductHistory); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateProductHistory: %w", err)
+	}
+	if q.createRefundStmt, err = db.PrepareContext(ctx, createRefund); err != nil {
+		return nil, fmt.Errorf("error preparing query CreateRefund: %w", err)
 	}
 	if q.createUserStmt, err = db.PrepareContext(ctx, createUser); err != nil {
 		return nil, fmt.Errorf("error preparing query CreateUser: %w", err)
@@ -102,6 +111,12 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.getCustomerByPhoneExceptIDStmt, err = db.PrepareContext(ctx, getCustomerByPhoneExceptID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetCustomerByPhoneExceptID: %w", err)
 	}
+	if q.getOrderByTrxNumberStmt, err = db.PrepareContext(ctx, getOrderByTrxNumber); err != nil {
+		return nil, fmt.Errorf("error preparing query GetOrderByTrxNumber: %w", err)
+	}
+	if q.getOrderItemsByOrderIDStmt, err = db.PrepareContext(ctx, getOrderItemsByOrderID); err != nil {
+		return nil, fmt.Errorf("error preparing query GetOrderItemsByOrderID: %w", err)
+	}
 	if q.getProductByIDStmt, err = db.PrepareContext(ctx, getProductByID); err != nil {
 		return nil, fmt.Errorf("error preparing query GetProductByID: %w", err)
 	}
@@ -135,8 +150,14 @@ func Prepare(ctx context.Context, db DBTX) (*Queries, error) {
 	if q.updateCustomerStmt, err = db.PrepareContext(ctx, updateCustomer); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateCustomer: %w", err)
 	}
+	if q.updateOrderStatusStmt, err = db.PrepareContext(ctx, updateOrderStatus); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateOrderStatus: %w", err)
+	}
 	if q.updateProductStmt, err = db.PrepareContext(ctx, updateProduct); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateProduct: %w", err)
+	}
+	if q.updateProductStockStmt, err = db.PrepareContext(ctx, updateProductStock); err != nil {
+		return nil, fmt.Errorf("error preparing query UpdateProductStock: %w", err)
 	}
 	if q.updateUserStmt, err = db.PrepareContext(ctx, updateUser); err != nil {
 		return nil, fmt.Errorf("error preparing query UpdateUser: %w", err)
@@ -164,6 +185,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing createCustomerStmt: %w", cerr)
 		}
 	}
+	if q.createOrderStmt != nil {
+		if cerr := q.createOrderStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createOrderStmt: %w", cerr)
+		}
+	}
+	if q.createOrderItemStmt != nil {
+		if cerr := q.createOrderItemStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createOrderItemStmt: %w", cerr)
+		}
+	}
 	if q.createProductStmt != nil {
 		if cerr := q.createProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductStmt: %w", cerr)
@@ -172,6 +203,11 @@ func (q *Queries) Close() error {
 	if q.createProductHistoryStmt != nil {
 		if cerr := q.createProductHistoryStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing createProductHistoryStmt: %w", cerr)
+		}
+	}
+	if q.createRefundStmt != nil {
+		if cerr := q.createRefundStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing createRefundStmt: %w", cerr)
 		}
 	}
 	if q.createUserStmt != nil {
@@ -279,6 +315,16 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing getCustomerByPhoneExceptIDStmt: %w", cerr)
 		}
 	}
+	if q.getOrderByTrxNumberStmt != nil {
+		if cerr := q.getOrderByTrxNumberStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getOrderByTrxNumberStmt: %w", cerr)
+		}
+	}
+	if q.getOrderItemsByOrderIDStmt != nil {
+		if cerr := q.getOrderItemsByOrderIDStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing getOrderItemsByOrderIDStmt: %w", cerr)
+		}
+	}
 	if q.getProductByIDStmt != nil {
 		if cerr := q.getProductByIDStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing getProductByIDStmt: %w", cerr)
@@ -334,9 +380,19 @@ func (q *Queries) Close() error {
 			err = fmt.Errorf("error closing updateCustomerStmt: %w", cerr)
 		}
 	}
+	if q.updateOrderStatusStmt != nil {
+		if cerr := q.updateOrderStatusStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateOrderStatusStmt: %w", cerr)
+		}
+	}
 	if q.updateProductStmt != nil {
 		if cerr := q.updateProductStmt.Close(); cerr != nil {
 			err = fmt.Errorf("error closing updateProductStmt: %w", cerr)
+		}
+	}
+	if q.updateProductStockStmt != nil {
+		if cerr := q.updateProductStockStmt.Close(); cerr != nil {
+			err = fmt.Errorf("error closing updateProductStockStmt: %w", cerr)
 		}
 	}
 	if q.updateUserStmt != nil {
@@ -391,8 +447,11 @@ type Queries struct {
 	checkTokenStmt                 *sql.Stmt
 	createCategoryStmt             *sql.Stmt
 	createCustomerStmt             *sql.Stmt
+	createOrderStmt                *sql.Stmt
+	createOrderItemStmt            *sql.Stmt
 	createProductStmt              *sql.Stmt
 	createProductHistoryStmt       *sql.Stmt
+	createRefundStmt               *sql.Stmt
 	createUserStmt                 *sql.Stmt
 	deleteCategoryByIDStmt         *sql.Stmt
 	deleteCustomerByIDStmt         *sql.Stmt
@@ -414,6 +473,8 @@ type Queries struct {
 	getCustomerByIDStmt            *sql.Stmt
 	getCustomerByPhoneStmt         *sql.Stmt
 	getCustomerByPhoneExceptIDStmt *sql.Stmt
+	getOrderByTrxNumberStmt        *sql.Stmt
+	getOrderItemsByOrderIDStmt     *sql.Stmt
 	getProductByIDStmt             *sql.Stmt
 	getUserByIDStmt                *sql.Stmt
 	getUserByUsernameStmt          *sql.Stmt
@@ -425,7 +486,9 @@ type Queries struct {
 	softDeleteUserByIDStmt         *sql.Stmt
 	updateCategoryStmt             *sql.Stmt
 	updateCustomerStmt             *sql.Stmt
+	updateOrderStatusStmt          *sql.Stmt
 	updateProductStmt              *sql.Stmt
+	updateProductStockStmt         *sql.Stmt
 	updateUserStmt                 *sql.Stmt
 	updateUserWithPasswordStmt     *sql.Stmt
 }
@@ -437,8 +500,11 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		checkTokenStmt:                 q.checkTokenStmt,
 		createCategoryStmt:             q.createCategoryStmt,
 		createCustomerStmt:             q.createCustomerStmt,
+		createOrderStmt:                q.createOrderStmt,
+		createOrderItemStmt:            q.createOrderItemStmt,
 		createProductStmt:              q.createProductStmt,
 		createProductHistoryStmt:       q.createProductHistoryStmt,
+		createRefundStmt:               q.createRefundStmt,
 		createUserStmt:                 q.createUserStmt,
 		deleteCategoryByIDStmt:         q.deleteCategoryByIDStmt,
 		deleteCustomerByIDStmt:         q.deleteCustomerByIDStmt,
@@ -460,6 +526,8 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		getCustomerByIDStmt:            q.getCustomerByIDStmt,
 		getCustomerByPhoneStmt:         q.getCustomerByPhoneStmt,
 		getCustomerByPhoneExceptIDStmt: q.getCustomerByPhoneExceptIDStmt,
+		getOrderByTrxNumberStmt:        q.getOrderByTrxNumberStmt,
+		getOrderItemsByOrderIDStmt:     q.getOrderItemsByOrderIDStmt,
 		getProductByIDStmt:             q.getProductByIDStmt,
 		getUserByIDStmt:                q.getUserByIDStmt,
 		getUserByUsernameStmt:          q.getUserByUsernameStmt,
@@ -471,7 +539,9 @@ func (q *Queries) WithTx(tx *sql.Tx) *Queries {
 		softDeleteUserByIDStmt:         q.softDeleteUserByIDStmt,
 		updateCategoryStmt:             q.updateCategoryStmt,
 		updateCustomerStmt:             q.updateCustomerStmt,
+		updateOrderStatusStmt:          q.updateOrderStatusStmt,
 		updateProductStmt:              q.updateProductStmt,
+		updateProductStockStmt:         q.updateProductStockStmt,
 		updateUserStmt:                 q.updateUserStmt,
 		updateUserWithPasswordStmt:     q.updateUserWithPasswordStmt,
 	}

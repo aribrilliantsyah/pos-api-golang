@@ -779,6 +779,102 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/product-history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Retrieve all product history with pagination",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product-history"
+                ],
+                "summary": "Get all product history",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page number",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 10,
+                        "description": "Limit per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new product stock history and update product stock",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "product-history"
+                ],
+                "summary": "Create product stock history",
+                "parameters": [
+                    {
+                        "description": "Product History Data",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateProductHistory"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/products": {
             "get": {
                 "security": [
@@ -1075,6 +1171,108 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/transaction/order": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Create product stock history",
+                "parameters": [
+                    {
+                        "description": "Order Data",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateOrder"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/transaction/refund": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Create a new order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transaction"
+                ],
+                "summary": "Create product stock history",
+                "parameters": [
+                    {
+                        "description": "Refund Data",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/schemas.CreateRefund"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/schemas.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/schemas.Response"
                         }
@@ -1477,6 +1675,65 @@ const docTemplate = `{
                 }
             }
         },
+        "schemas.CreateOrder": {
+            "type": "object",
+            "required": [
+                "items",
+                "payment_method",
+                "type"
+            ],
+            "properties": {
+                "customer": {
+                    "description": "- new: required: customer.name, customer.email, customer.phone\n- guest: required: guest_name\n- member: required: customer.id",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/schemas.Customer"
+                        }
+                    ]
+                },
+                "customer_id": {
+                    "type": "integer"
+                },
+                "items": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/schemas.CreateOrderItem"
+                    }
+                },
+                "payment_method": {
+                    "type": "string",
+                    "enum": [
+                        "cash",
+                        "transfer"
+                    ]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "new",
+                        "guest",
+                        "member"
+                    ]
+                }
+            }
+        },
+        "schemas.CreateOrderItem": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
         "schemas.CreateProduct": {
             "type": "object",
             "required": [
@@ -1493,6 +1750,44 @@ const docTemplate = `{
                 },
                 "price": {
                     "type": "number"
+                }
+            }
+        },
+        "schemas.CreateProductHistory": {
+            "type": "object",
+            "required": [
+                "product_id",
+                "quantity_change",
+                "reason",
+                "type"
+            ],
+            "properties": {
+                "product_id": {
+                    "type": "integer"
+                },
+                "quantity_change": {
+                    "type": "integer"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "in",
+                        "out"
+                    ]
+                }
+            }
+        },
+        "schemas.CreateRefund": {
+            "type": "object",
+            "required": [
+                "trx_number"
+            ],
+            "properties": {
+                "trx_number": {
+                    "type": "string"
                 }
             }
         },
@@ -1515,6 +1810,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "schemas.Customer": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
                     "type": "string"
                 }
             }

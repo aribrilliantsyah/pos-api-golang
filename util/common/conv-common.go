@@ -32,3 +32,10 @@ func ConvertNullInt64(ni sql.NullInt64) int64 {
 	}
 	return 0
 }
+
+func ConvertNullFLoat64(ni sql.NullFloat64) float64 {
+	if ni.Valid {
+		return ni.Float64
+	}
+	return 0
+}

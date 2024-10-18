@@ -3,6 +3,7 @@
 -- name: GetAllProducts :many
 SELECT * 
 FROM products
+WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2;
 
@@ -39,3 +40,11 @@ RETURNING *;
 DELETE FROM products
 WHERE id = $1
 RETURNING id;
+
+-- name: UpdateProductStock :one
+UPDATE products 
+SET stock = $2, 
+    updated_by = $3, 
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = $1 
+RETURNING *;

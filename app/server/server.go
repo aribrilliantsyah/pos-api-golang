@@ -21,6 +21,7 @@ type Server struct {
 	engine *gin.Engine
 	db     *dbCon.Queries
 	ctx    context.Context
+	sqlDB  *sql.DB
 }
 
 func NewServer(config config.Config) *Server {
@@ -38,6 +39,7 @@ func NewServer(config config.Config) *Server {
 		engine: gin.Default(),
 		db:     db,
 		ctx:    ctx,
+		sqlDB:  conn,
 	}
 
 	// Initialize Swagger
@@ -68,6 +70,8 @@ func (s *Server) setupRoutes() {
 	routes.SetupCategoryRoutes(s.db, s.ctx, protected)
 	routes.SetupCustomerRoutes(s.db, s.ctx, protected)
 	routes.SetupProductRoutes(s.db, s.ctx, protected)
+	routes.SetupProductHistoryRoutes(s.db, s.ctx, protected)
+	routes.SetupTransactionRoutes(s.db, s.ctx, s.sqlDB, protected)
 
 	// Handle 404
 	s.engine.NoRoute(func(ctx *gin.Context) {

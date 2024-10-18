@@ -35,12 +35,15 @@ type Customer struct {
 
 type Order struct {
 	ID            int64         `json:"id"`
+	TrxNumber     string        `json:"trx_number"`
 	CashierID     sql.NullInt64 `json:"cashier_id"`
 	CustomerID    sql.NullInt64 `json:"customer_id"`
 	TotalAmount   string        `json:"total_amount"`
 	PaymentMethod string        `json:"payment_method"`
 	Status        string        `json:"status"`
 	OrderDate     sql.NullTime  `json:"order_date"`
+	UpdatedBy     sql.NullInt64 `json:"updated_by"`
+	UpdatedAt     sql.NullTime  `json:"updated_at"`
 }
 
 type OrderItem struct {

@@ -17,6 +17,49 @@ definitions:
     required:
     - name
     type: object
+  schemas.CreateOrder:
+    properties:
+      customer:
+        allOf:
+        - $ref: '#/definitions/schemas.Customer'
+        description: |-
+          - new: required: customer.name, customer.email, customer.phone
+          - guest: required: guest_name
+          - member: required: customer.id
+      customer_id:
+        type: integer
+      items:
+        items:
+          $ref: '#/definitions/schemas.CreateOrderItem'
+        minItems: 1
+        type: array
+      payment_method:
+        enum:
+        - cash
+        - transfer
+        type: string
+      type:
+        enum:
+        - new
+        - guest
+        - member
+        type: string
+    required:
+    - items
+    - payment_method
+    - type
+    type: object
+  schemas.CreateOrderItem:
+    properties:
+      product_id:
+        type: integer
+      quantity:
+        minimum: 1
+        type: integer
+    required:
+    - product_id
+    - quantity
+    type: object
   schemas.CreateProduct:
     properties:
       category_id:
@@ -29,6 +72,32 @@ definitions:
     - category_id
     - name
     - price
+    type: object
+  schemas.CreateProductHistory:
+    properties:
+      product_id:
+        type: integer
+      quantity_change:
+        type: integer
+      reason:
+        type: string
+      type:
+        enum:
+        - in
+        - out
+        type: string
+    required:
+    - product_id
+    - quantity_change
+    - reason
+    - type
+    type: object
+  schemas.CreateRefund:
+    properties:
+      trx_number:
+        type: string
+    required:
+    - trx_number
     type: object
   schemas.CreateUser:
     properties:
@@ -45,6 +114,15 @@ definitions:
     - password
     - role
     - username
+    type: object
+  schemas.Customer:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
     type: object
   schemas.Login:
     properties:
@@ -595,6 +673,67 @@ paths:
       summary: Get all deleted customers
       tags:
       - customers
+  /api/v1/product-history:
+    get:
+      description: Retrieve all product history with pagination
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Limit per page
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Get all product history
+      tags:
+      - product-history
+    post:
+      consumes:
+      - application/json
+      description: Create a new product stock history and update product stock
+      parameters:
+      - description: Product History Data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateProductHistory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Create product stock history
+      tags:
+      - product-history
   /api/v1/products:
     get:
       description: Retrieve all products with pagination
@@ -792,6 +931,70 @@ paths:
       summary: Get all deleted products
       tags:
       - products
+  /api/v1/transaction/order:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order
+      parameters:
+      - description: Order Data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateOrder'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Create product stock history
+      tags:
+      - transaction
+  /api/v1/transaction/refund:
+    post:
+      consumes:
+      - application/json
+      description: Create a new order
+      parameters:
+      - description: Refund Data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/schemas.CreateRefund'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/schemas.Response'
+        "502":
+          description: Bad Gateway
+          schema:
+            $ref: '#/definitions/schemas.Response'
+      security:
+      - BearerAuth: []
+      summary: Create product stock history
+      tags:
+      - transaction
   /api/v1/users:
     get:
       description: Retrieve all users with pagination

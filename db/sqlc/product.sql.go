@@ -113,6 +113,7 @@ const getAllProducts = `-- name: GetAllProducts :many
 
 SELECT id, name, price, stock, category_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at 
 FROM products
+WHERE deleted_at IS NULL
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `
@@ -239,6 +240,40 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		arg.CategoryID,
 		arg.UpdatedBy,
 	)
+	var i Product
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Price,
+		&i.Stock,
+		&i.CategoryID,
+		&i.CreatedBy,
+		&i.UpdatedBy,
+		&i.DeletedBy,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.DeletedAt,
+	)
+	return i, err
+}
+
+const updateProductStock = `-- name: UpdateProductStock :one
+UPDATE products 
+SET stock = $2, 
+    updated_by = $3, 
+    updated_at = CURRENT_TIMESTAMP
+WHERE id = $1 
+RETURNING id, name, price, stock, category_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at
+`
+
+type UpdateProductStockParams struct {
+	ID        int64         `json:"id"`
+	Stock     int32         `json:"stock"`
+	UpdatedBy sql.NullInt64 `json:"updated_by"`
+}
+
+func (q *Queries) UpdateProductStock(ctx context.Context, arg UpdateProductStockParams) (Product, error) {
+	row := q.queryRow(ctx, q.updateProductStockStmt, updateProductStock, arg.ID, arg.Stock, arg.UpdatedBy)
 	var i Product
 	err := row.Scan(
 		&i.ID,

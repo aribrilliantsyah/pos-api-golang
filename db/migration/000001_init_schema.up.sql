@@ -65,12 +65,15 @@ CREATE TABLE product_history (
 
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
+    trx_number VARCHAR NOT NULL,
     cashier_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
     customer_id BIGINT REFERENCES customers(id) ON DELETE SET NULL,
     total_amount DECIMAL NOT NULL,
     payment_method VARCHAR NOT NULL,
     status VARCHAR NOT NULL,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_by BIGINT,
+    updated_at TIMESTAMP
 );
 
 CREATE TABLE refunds (
