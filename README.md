@@ -1,6 +1,6 @@
-# Proyek Golang: API Point Of Sales (POS) Simple
+# Proyek Golang: API Point Of Sales (POS)
 
-Proyek ini adalah API berbasis Golang untuk mengelola penjulan sederhana. Menggunakan PostgreSQL sebagai database dan menyertakan fitur-fitur seperti pendaftaran pengguna, login, dan autentikasi JWT.
+Proyek ini adalah API berbasis Golang untuk mengelola sistem point of sale (POS) dengan fitur lengkap. Menggunakan PostgreSQL sebagai database dan menyertakan berbagai modul pengelolaan bisnis.
 
 ## Persyaratan Sistem
 
@@ -8,6 +8,46 @@ Proyek ini adalah API berbasis Golang untuk mengelola penjulan sederhana. Menggu
 - PostgreSQL versi 14 atau lebih tinggi
 
 Pastikan Anda telah menginstal dan mengkonfigurasi kedua software tersebut sebelum menjalankan proyek ini.
+
+## Fitur Utama
+
+### 🔐 Autentikasi
+- Sistem keamanan menggunakan JSON Web Token (JWT)
+- Kontrol akses berbasis peran (role-based access)
+
+### 📦 Modul-Modul Inti
+
+#### Manajemen Kategori
+- Operasi CRUD untuk kategori produk
+- Kategorisasi produk yang efisien
+
+#### Manajemen Produk
+- Operasi CRUD lengkap untuk produk
+- Pengelolaan detail dan harga produk
+
+#### Manajemen Pengguna
+- Peran pengguna: Admin dan Kasir
+- Operasi CRUD untuk akun pengguna
+- Izin berbasis peran
+
+#### Manajemen Pelanggan
+- Operasi CRUD untuk data pelanggan
+- Pengelolaan profil pelanggan
+
+#### Manajemen Inventori
+- Pelacakan stok produk
+- Pengelolaan inventori masuk dan keluar
+- Riwayat stok
+
+#### Pemrosesan Transaksi
+- Sistem manajemen pesanan
+- Kemampuan pemrosesan pengembalian
+- Riwayat transaksi
+
+#### Modul Pelaporan
+- Laporan penjualan komprehensif
+- Visualisasi dan analisis data
+- Fungsi ekspor
 
 ## Konfigurasi
 
@@ -31,8 +71,8 @@ Pastikan untuk menyesuaikan nilai-nilai ini sesuai dengan pengaturan spesifik An
 
 Untuk memulai proyek:
 
-1. Pastikan Anda telah menginstal Golang di sistem Anda.
-2. Navigasikan ke direktori root proyek.
+1. Pastikan Anda telah menginstal Golang di sistem Anda
+2. Navigasikan ke direktori root proyek
 3. Jalankan perintah berikut:
 
    ```
@@ -49,25 +89,16 @@ Dokumentasi API tersedia melalui Swagger UI. Setelah server berjalan, Anda dapat
 http://localhost:8080/docs/index.html
 ```
 
+```
+http://localhost:8080/scalar/docs
+```
+
 Ganti `8080` dengan nomor port yang sebenarnya jika Anda telah mengubahnya dalam konfigurasi.
 
-## Menggunakan API
+## Tech Stack
 
-1. **Mendaftarkan Pengguna**:
-   Gunakan endpoint register di Swagger UI untuk membuat akun pengguna baru.
-
-2. **Login**:
-   Setelah mendaftar, gunakan endpoint login untuk mendapatkan token JWT.
-
-3. **Mengakses Rute Terproteksi**:
-   Untuk mengakses rute terproteksi:
-   - Untuk setiap endpoint API yang memerlukan autentikasi, cari kolom input header "Authorization".
-   - Masukkan token JWT Anda dalam format: `Bearer <token_anda_di_sini>`
-   - Kirim permintaan dengan token yang disertakan dalam header.
-
-   Metode ini memungkinkan Anda untuk menambahkan token secara individual untuk setiap panggilan API, memberikan Anda lebih banyak kontrol atas permintaan mana yang menyertakan autentikasi.
-
-## Catatan Keamanan
-
-Ingatlah untuk menjaga `JWT_SECRET` Anda tetap aman dan jangan pernah meng-commit-nya ke version control. Dalam lingkungan produksi, pertimbangkan untuk menggunakan variabel lingkungan atau sistem manajemen rahasia yang aman.
-
+- Backend: Golang
+- Database: PostgreSQL
+- Autentikasi: JWT (JSON Web Token)
+- SQL Tools: SQLC
+- Documentation: OAS, Swagger, Scalar
