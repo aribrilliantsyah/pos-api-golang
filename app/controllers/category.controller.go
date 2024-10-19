@@ -449,10 +449,21 @@ func (c *CategoryController) SoftDeleteCategoryById(ctx *gin.Context) {
 		return
 	}
 
+	userInfo, err := jwt.GetUserInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "failed",
+			"message": err.Error(),
+		})
+		return
+	}
+	UserID := userInfo.UserID
+
 	args := &db.SoftDeleteCategoryByIDParams{
 		ID:        id,
-		DeletedBy: sql.NullInt64{Int64: id, Valid: true},
+		DeletedBy: sql.NullInt64{Int64: UserID, Valid: true},
 	}
+
 	_, err = c.db.SoftDeleteCategoryByID(ctx, *args)
 	if err != nil {
 		ctx.JSON(http.StatusBadGateway, gin.H{

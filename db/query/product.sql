@@ -21,7 +21,7 @@ RETURNING *;
 
 -- name: UpdateProduct :one
 UPDATE products
-SET name = $2, price = $3, stock = $4, category_id = $5, updated_by = $6, updated_at = CURRENT_TIMESTAMP
+SET name = $2, price = $3, category_id = $4, updated_by = $5, updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
 RETURNING *;
 

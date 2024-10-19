@@ -217,7 +217,7 @@ func (q *Queries) SoftDeleteProductByID(ctx context.Context, arg SoftDeleteProdu
 
 const updateProduct = `-- name: UpdateProduct :one
 UPDATE products
-SET name = $2, price = $3, stock = $4, category_id = $5, updated_by = $6, updated_at = CURRENT_TIMESTAMP
+SET name = $2, price = $3, category_id = $4, updated_by = $5, updated_at = CURRENT_TIMESTAMP
 WHERE id = $1
 RETURNING id, name, price, stock, category_id, created_by, updated_by, deleted_by, created_at, updated_at, deleted_at
 `
@@ -226,7 +226,6 @@ type UpdateProductParams struct {
 	ID         int64         `json:"id"`
 	Name       string        `json:"name"`
 	Price      string        `json:"price"`
-	Stock      int32         `json:"stock"`
 	CategoryID sql.NullInt64 `json:"category_id"`
 	UpdatedBy  sql.NullInt64 `json:"updated_by"`
 }
@@ -236,7 +235,6 @@ func (q *Queries) UpdateProduct(ctx context.Context, arg UpdateProductParams) (P
 		arg.ID,
 		arg.Name,
 		arg.Price,
-		arg.Stock,
 		arg.CategoryID,
 		arg.UpdatedBy,
 	)

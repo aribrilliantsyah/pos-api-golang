@@ -298,7 +298,7 @@ SELECT
     c.phone,
     c.email,
     COUNT(DISTINCT o.id) as total_orders,
-    SUM(o.total_amount) as total_spent,
+    SUM(o.total_amount)::DECIMAL as total_spent,
     AVG(o.total_amount) as average_order_amount
 FROM customers c
 JOIN orders o ON c.id = o.customer_id
@@ -322,7 +322,7 @@ type GetTopCustomersRow struct {
 	Phone              sql.NullString `json:"phone"`
 	Email              sql.NullString `json:"email"`
 	TotalOrders        int64          `json:"total_orders"`
-	TotalSpent         int64          `json:"total_spent"`
+	TotalSpent         string         `json:"total_spent"`
 	AverageOrderAmount float64        `json:"average_order_amount"`
 }
 

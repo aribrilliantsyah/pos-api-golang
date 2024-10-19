@@ -75,7 +75,7 @@ SELECT
     c.phone,
     c.email,
     COUNT(DISTINCT o.id) as total_orders,
-    SUM(o.total_amount) as total_spent,
+    SUM(o.total_amount)::DECIMAL as total_spent,
     AVG(o.total_amount) as average_order_amount
 FROM customers c
 JOIN orders o ON c.id = o.customer_id
